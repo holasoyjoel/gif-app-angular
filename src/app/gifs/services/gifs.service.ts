@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Gif, SearchGifsResponse } from "../interfaces/gifs.interface";
 
@@ -8,6 +8,7 @@ import { Gif, SearchGifsResponse } from "../interfaces/gifs.interface";
 export class GifsService{
     private apiKey: string = 's1s7CN6QmDMOlK8pWssoPjIKXGZU4ZNg';
     private _historial: string[] = [];
+    private servicioUrl: string = 'https://api.giphy.com/v1/gifs';
     public resultados: Gif[] = [];
 
 
@@ -34,8 +35,15 @@ export class GifsService{
             localStorage.setItem('historial' , JSON.stringify(this._historial));
         }
 
+        // me permite construir todos los parametros de una manera sencilla
+        const params = new HttpParams()
+          .set('api_key' , this.apiKey)
+          .set('limit' , '10')
+          .set('q' , query);
+
+
         // peticion http GET, POST, PUT, DELETE (el http trabaja en base a observable)
-        this.http.get<SearchGifsResponse>(`https://api.giphy.com/v1/gifs/search?api_key=s1s7CN6QmDMOlK8pWssoPjIKXGZU4ZNg&q=${query}&limit=10`)
+        this.http.get<SearchGifsResponse>(`${this.servicioUrl}/search` , {params: params})
         .subscribe((resp) => {
             this.resultados = resp.data;
             localStorage.setItem('resultados' , JSON.stringify(this.resultados));
